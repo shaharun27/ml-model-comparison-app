@@ -1,2 +1,1 @@
-# ml-model-comparison-app
-ML MODEL COMPARISON
+# ML MODEL COMPARISON APP
