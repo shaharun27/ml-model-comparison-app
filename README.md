@@ -59,7 +59,7 @@ Six machine learning models were implemented and evaluated:
 Based on the final trained models:
 
 | Model | Accuracy | AUC | Precision | Recall | F1 Score | MCC |
-| :--- | :--- | :--- | :--- | : :--- | :--- | :--- |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | Logistic Regression | 0.9234 | 0.9643 | 0.9453 | 0.9641 | 0.9546 | 0.7115 |
 | Decision Tree | 0.9950 | 0.9889 | 0.9960 | 0.9980 | 0.9970 | 0.9818 |
 | KNN | 0.8793 | 0.8726 | 0.8965 | 0.9671 | 0.9305 | 0.4986 |
