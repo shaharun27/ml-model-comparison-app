@@ -107,10 +107,10 @@ st.download_button(
 # FILE UPLOAD
 # --------------------------------------------------
 
-st.header("Upload Credit Card Default Dataset (CSV or XLS)")
+st.header("Upload Credit Card Default Dataset (CSV)")
 uploaded_file = st.file_uploader(
     "Upload file (must contain target column)",
-    type=["csv", "xls"]
+    type=["csv"]
 )
 
 if uploaded_file is not None:
