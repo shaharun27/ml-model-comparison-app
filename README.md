@@ -143,10 +143,10 @@ ml-model-comparison-app/
 │   └── 6_xgboost.ipynb
 │
 └── data/
-    ├── train.csv
-    └── test.csv
+    ├── credit_default.csv
+    └── sample_credit_default_test_data.csv
 
-
+************************************************************************************************
 **Key Insights**
 
 Tree-based and ensemble models significantly outperform linear models.
@@ -158,6 +158,9 @@ Credit default prediction benefits strongly from non-linear learning.
 MCC confirms strong balanced classification performance.
 
 Ensemble methods are highly suitable for financial risk modeling.
+
+
+*************************************************************************************************
 
 **Conclusion**
 
