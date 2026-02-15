@@ -21,11 +21,11 @@ from sklearn.metrics import (
     classification_report,
     confusion_matrix
 )
+
 from xgboost import XGBClassifier
 
-
 # --------------------------------------------------
-# Page Configuration
+# PAGE CONFIGURATION
 # --------------------------------------------------
 
 st.set_page_config(
@@ -36,43 +36,59 @@ st.set_page_config(
 st.title("Credit Card Default Prediction – ML Model Comparison")
 st.markdown("BITS Pilani – Machine Learning Assignment 2")
 
+# --------------------------------------------------
+# SAMPLE DATA GENERATOR (REALISTIC PATTERN)
+# --------------------------------------------------
+
 def generate_sample_data():
     np.random.seed(42)
 
     start_id = 23999
     end_id = 30000
-    n_rows = end_id - start_id + 1   # 6002 rows
+    n_rows = end_id - start_id + 1
+
+    LIMIT_BAL = np.random.randint(10000, 1000000, n_rows)
+    AGE = np.random.randint(21, 75, n_rows)
+
+    PAY_0 = np.random.randint(-2, 9, n_rows)
+    PAY_2 = np.random.randint(-2, 9, n_rows)
+
+    BILL_AMT1 = np.random.randint(0, 200000, n_rows)
+    PAY_AMT1 = np.random.randint(0, 50000, n_rows)
+
+    # Realistic default logic
+    target = (
+        (PAY_0 > 2) |
+        (PAY_2 > 2) |
+        (PAY_AMT1 < BILL_AMT1 * 0.1)
+    ).astype(int)
 
     df = pd.DataFrame({
         "ID": np.arange(start_id, end_id + 1),
-        "LIMIT_BAL": np.random.randint(10000, 1000000, n_rows),
+        "LIMIT_BAL": LIMIT_BAL,
         "SEX": np.random.choice([1, 2], n_rows),
         "EDUCATION": np.random.choice([1, 2, 3, 4], n_rows),
         "MARRIAGE": np.random.choice([1, 2, 3], n_rows),
-        "AGE": np.random.randint(21, 75, n_rows),
-
-        "PAY_0": np.random.randint(-2, 9, n_rows),
-        "PAY_2": np.random.randint(-2, 9, n_rows),
+        "AGE": AGE,
+        "PAY_0": PAY_0,
+        "PAY_2": PAY_2,
         "PAY_3": np.random.randint(-2, 9, n_rows),
         "PAY_4": np.random.randint(-2, 9, n_rows),
         "PAY_5": np.random.randint(-2, 9, n_rows),
         "PAY_6": np.random.randint(-2, 9, n_rows),
-
-        "BILL_AMT1": np.random.randint(0, 200000, n_rows),
+        "BILL_AMT1": BILL_AMT1,
         "BILL_AMT2": np.random.randint(0, 200000, n_rows),
         "BILL_AMT3": np.random.randint(0, 200000, n_rows),
         "BILL_AMT4": np.random.randint(0, 200000, n_rows),
         "BILL_AMT5": np.random.randint(0, 200000, n_rows),
         "BILL_AMT6": np.random.randint(0, 200000, n_rows),
-
-        "PAY_AMT1": np.random.randint(0, 50000, n_rows),
+        "PAY_AMT1": PAY_AMT1,
         "PAY_AMT2": np.random.randint(0, 50000, n_rows),
         "PAY_AMT3": np.random.randint(0, 50000, n_rows),
         "PAY_AMT4": np.random.randint(0, 50000, n_rows),
         "PAY_AMT5": np.random.randint(0, 50000, n_rows),
         "PAY_AMT6": np.random.randint(0, 50000, n_rows),
-
-        "target": np.random.choice([0, 1], n_rows)
+        "target": target
     })
 
     return df
@@ -88,48 +104,50 @@ st.download_button(
 )
 
 # --------------------------------------------------
-# Upload Dataset
+# FILE UPLOAD
 # --------------------------------------------------
 
 st.header("Upload Credit Card Default Dataset (CSV or XLS)")
 uploaded_file = st.file_uploader(
-    "Upload file (must contain default column)",
+    "Upload file (must contain target column)",
     type=["csv", "xls"]
 )
 
 if uploaded_file is not None:
 
-    # --------------------------------------------------
-    # Read file (CSV or XLS)
-    # --------------------------------------------------
     try:
         if uploaded_file.name.endswith(".csv"):
             df = pd.read_csv(uploaded_file)
         else:
-            df = pd.read_excel(uploaded_file, header=1)
+            df = pd.read_excel(uploaded_file)
     except Exception as e:
         st.error(f"Error reading file: {e}")
         st.stop()
 
-    # Clean column names
     df.columns = df.columns.str.strip()
 
-    # Rename target column automatically
-    if "default.payment.next.month" in df.columns:
-        df.rename(columns={"default.payment.next.month": "target"}, inplace=True)
+    # Auto rename possible target names
+    rename_dict = {
+        "default.payment.next.month": "target",
+        "default payment next month": "target",
+        "default": "target"
+    }
 
-    if "default payment next month" in df.columns:
-        df.rename(columns={"default payment next month": "target"}, inplace=True)
+    df.rename(columns=rename_dict, inplace=True)
 
     if "target" not in df.columns:
         st.error("Dataset must contain a 'target' column.")
         st.stop()
 
-    st.success("Dataset loaded successfully!")
+    # Remove ID column
+    if "ID" in df.columns:
+        df = df.drop("ID", axis=1)
+
+    st.success("Dataset Loaded Successfully!")
     st.dataframe(df.head())
 
     # --------------------------------------------------
-    # Train-Test Split
+    # SPLIT DATA
     # --------------------------------------------------
 
     X = df.drop("target", axis=1)
@@ -146,7 +164,7 @@ if uploaded_file is not None:
     st.write("Test Shape:", X_test.shape)
 
     # --------------------------------------------------
-    # Model Selection
+    # MODEL SELECTION
     # --------------------------------------------------
 
     st.sidebar.header("Select Model")
@@ -167,81 +185,29 @@ if uploaded_file is not None:
 
         model = None
 
-        # --------------------------------------------------
-        # Logistic Regression
-        # --------------------------------------------------
+        # Logistic / KNN / NB need scaling
+        if model_name in ["Logistic Regression", "KNN", "Naive Bayes"]:
+            scaler = StandardScaler()
+            X_train = scaler.fit_transform(X_train)
+            X_test = scaler.transform(X_test)
+
+        # Initialize model
         if model_name == "Logistic Regression":
-
-            scaler = StandardScaler()
-            X_train_scaled = scaler.fit_transform(X_train)
-            X_test_scaled = scaler.transform(X_test)
-
             model = LogisticRegression(max_iter=1000)
-            model.fit(X_train_scaled, y_train)
 
-            y_pred = model.predict(X_test_scaled)
-            y_prob = model.predict_proba(X_test_scaled)[:, 1]
-
-        # --------------------------------------------------
-        # Decision Tree
-        # --------------------------------------------------
         elif model_name == "Decision Tree":
-
             model = DecisionTreeClassifier(random_state=42)
-            model.fit(X_train, y_train)
 
-            y_pred = model.predict(X_test)
-            y_prob = model.predict_proba(X_test)[:, 1]
-
-        # --------------------------------------------------
-        # KNN
-        # --------------------------------------------------
         elif model_name == "KNN":
-
-            scaler = StandardScaler()
-            X_train_scaled = scaler.fit_transform(X_train)
-            X_test_scaled = scaler.transform(X_test)
-
             model = KNeighborsClassifier(n_neighbors=5)
-            model.fit(X_train_scaled, y_train)
 
-            y_pred = model.predict(X_test_scaled)
-            y_prob = model.predict_proba(X_test_scaled)[:, 1]
-
-        # --------------------------------------------------
-        # Naive Bayes
-        # --------------------------------------------------
         elif model_name == "Naive Bayes":
-
-            scaler = StandardScaler()
-            X_train_scaled = scaler.fit_transform(X_train)
-            X_test_scaled = scaler.transform(X_test)
-
             model = GaussianNB()
-            model.fit(X_train_scaled, y_train)
 
-            y_pred = model.predict(X_test_scaled)
-            y_prob = model.predict_proba(X_test_scaled)[:, 1]
-
-        # --------------------------------------------------
-        # Random Forest
-        # --------------------------------------------------
         elif model_name == "Random Forest":
+            model = RandomForestClassifier(n_estimators=100, random_state=42)
 
-            model = RandomForestClassifier(
-                n_estimators=100,
-                random_state=42
-            )
-            model.fit(X_train, y_train)
-
-            y_pred = model.predict(X_test)
-            y_prob = model.predict_proba(X_test)[:, 1]
-
-        # --------------------------------------------------
-        # XGBoost
-        # --------------------------------------------------
         elif model_name == "XGBoost":
-
             model = XGBClassifier(
                 n_estimators=100,
                 max_depth=6,
@@ -249,13 +215,16 @@ if uploaded_file is not None:
                 eval_metric="logloss",
                 random_state=42
             )
-            model.fit(X_train, y_train)
 
-            y_pred = model.predict(X_test)
-            y_prob = model.predict_proba(X_test)[:, 1]
+        # Train
+        model.fit(X_train, y_train)
+
+        # Predict
+        y_pred = model.predict(X_test)
+        y_prob = model.predict_proba(X_test)[:, 1]
 
         # --------------------------------------------------
-        # Evaluation
+        # EVALUATION
         # --------------------------------------------------
 
         st.header("Model Evaluation")
@@ -268,28 +237,14 @@ if uploaded_file is not None:
         mcc = matthews_corrcoef(y_test, y_pred)
 
         metrics_df = pd.DataFrame({
-            "Metric": [
-                "Accuracy",
-                "AUC Score",
-                "Precision",
-                "Recall",
-                "F1 Score",
-                "MCC"
-            ],
-            "Value": [
-                accuracy,
-                auc,
-                precision,
-                recall,
-                f1,
-                mcc
-            ]
+            "Metric": ["Accuracy", "AUC Score", "Precision", "Recall", "F1 Score", "MCC"],
+            "Value": [accuracy, auc, precision, recall, f1, mcc]
         })
 
         st.dataframe(metrics_df.set_index("Metric"))
 
         # --------------------------------------------------
-        # Confusion Matrix
+        # CONFUSION MATRIX
         # --------------------------------------------------
 
         st.subheader("Confusion Matrix")
@@ -310,12 +265,14 @@ if uploaded_file is not None:
         st.pyplot(fig)
 
         # --------------------------------------------------
-        # Classification Report
+        # CLASSIFICATION REPORT
         # --------------------------------------------------
 
         st.subheader("Classification Report")
+
         report_dict = classification_report(y_test, y_pred, output_dict=True)
         report_df = pd.DataFrame(report_dict).transpose()
         st.dataframe(report_df)
+
 else:
     st.info("Upload dataset to begin.")
