@@ -314,8 +314,8 @@ if uploaded_file is not None:
         # --------------------------------------------------
 
         st.subheader("Classification Report")
-        report = classification_report(y_test, y_pred)
-        st.text(report)
-
+        report_dict = classification_report(y_test, y_pred, output_dict=True)
+        report_df = pd.DataFrame(report_dict).transpose()
+        st.dataframe(report_df)
 else:
     st.info("Upload dataset to begin.")
