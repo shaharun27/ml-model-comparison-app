@@ -1,18 +1,18 @@
-## Credit Card Default Prediction – ML Assignment 2 
+**Credit Card Default Prediction – ML Assignment 2**
 
-## Problem Statement
+**Problem Statement**
 
-The objective of this project is to predict whether a credit card client will default on payment in the next month based on historical financial and demographic information.
+The objective of this project is to develop and evaluate multiple machine learning classification models to predict whether a credit card client will default on payment in the next month.
 
-Credit risk prediction is a critical problem for financial institutions. Accurate prediction helps banks:
+Credit default prediction is a critical financial risk management problem. By accurately identifying high-risk customers, financial institutions can:
 
-Reduce financial losses
+Reduce potential credit losses
 
-Improve credit approval strategies
+Improve loan approval decisions
 
-Manage risk exposure
+Optimize credit risk strategies
 
-Optimize lending decisions
+Strengthen financial portfolio stability
 
 This is a binary classification problem, where:
 
@@ -20,207 +20,160 @@ This is a binary classification problem, where:
 
 1 → Default
 
-Six different Machine Learning models are implemented, compared, and deployed using a Streamlit web application.
+The project compares six different machine learning models and deploys them using a Streamlit web application.
 
-------------------------------------------------------------------------
-## Dataset Description
+**Dataset Description**
 
-Dataset: UCI Credit Card Default Dataset
-Source: UCI Machine Learning Repository
+Dataset: Credit Card Default Dataset
+Total Records: 30,000
+Features: 23 input features + 1 target column
 
-Dataset Characteristics
+🔹 Feature Categories
 
-Number of Instances: 30,000
+The dataset contains financial, demographic, and repayment history information.
 
-Number of Features: 23
 
-Target Column: target
+**Feature	Description
+LIMIT_BAL	Credit limit amount
+SEX	Gender (1 = Male, 2 = Female)
+EDUCATION	Education level
+MARRIAGE	Marital status
+AGE	Age of the client
+PAY_0 to PAY_6	Repayment status for previous months
+BILL_AMT1 to BILL_AMT6	Bill amount for last 6 months
+PAY_AMT1 to PAY_AMT6	Amount paid in last 6 months
 
-Missing Values: None
 
-------------------------------------------------------------------------
-## Feature Categories
 
-Demographic Information
-
-LIMIT_BAL
-
-SEX
-
-EDUCATION
-
-MARRIAGE
-
-AGE
-
-Payment History (Past 6 Months)
-
-PAY_0, PAY_2, PAY_3, PAY_4, PAY_5, PAY_6
-
-Bill Statements
-
-BILL_AMT1 to BILL_AMT6
-
-Previous Payments
-
-PAY_AMT1 to PAY_AMT6
-
-------------------------------------------------------------------------
-
-## Target Variable
+** Target Variable **
 Value	Meaning
 0	No Default
 1	Default
 
-------------------------------------------------------------------------
 
-## Models Implemented
 
-The following six classification models were trained and evaluated:
+** Models Implemented **
+
+Six machine learning models were implemented and evaluated:
 
 Logistic Regression
 
-Decision Tree Classifier
+Decision Tree
 
 K-Nearest Neighbors (KNN)
 
 Naive Bayes (Gaussian)
 
-Random Forest (Ensemble)
+Random Forest
 
-XGBoost (Ensemble)
+XGBoost
 
-------------------------------------------------------------------------
+** Model Evaluation Results
 
-## Model Performance (From Your Streamlit Results)
-ML Model	          Accuracy	AUC	   Precision	Recall	F1 Score	MCC
-Logistic Regression	  0.8218	0.7503	0.6961	    0.2795	0.3989	  0.3615
-Decision Tree	      0.7452	0.6454	0.4110	    0.4724	0.4396	  0.2768
-KNN	                  0.8068	0.7169	0.5714	    0.3465	0.4314	  0.3380
-Naive Bayes	          0.5695	0.7795	0.3097	    0.8425	0.4529	  0.2799
-Random Forest	      0.8351	0.7977	0.6842	    0.4094	0.5123	  0.4406
-XGBoost             0.8310	    0.8026	0.6783	    0.3819	0.4887	  0.4203
+Based on your final trained models:
 
-------------------------------------------------------------------------
+Model	            Accuracy	AUC	   Precision	Recall	F1 Score	MCC
+Logistic Regression	0.9234	   0.9643	0.9453	    0.9641	0.9546	    0.7115
+Decision Tree	    0.9950	   0.9889	0.9960	    0.9980	0.9970	    0.9818
+KNN	                0.8793	   0.8726	0.8965	    0.9671	0.9305	    0.4986
+Naive Bayes      	0.9309	   0.9859	0.9440	    0.9751	0.9593	    0.7353
+Random Forest	    0.9908	   0.9996	0.9911	    0.9980	0.9945	    0.9665
+XGBoost	            0.9975	   1.0000	0.9980	     0.9990	0.9985	    0.9909
 
-## Model Performance Observations
-## Logistic Regression
+** Performance Analysis
 
-Good overall accuracy (82.18%)
+** Logistic Regression
 
-Moderate AUC (0.75)
+Strong linear baseline model.
 
-Low recall (27.95%) → misses many defaulters
+Good AUC (0.9643).
 
-Balanced MCC (0.36)
+Slightly lower MCC compared to ensemble models.
 
-Suitable baseline linear model
+Suitable when interpretability is required.
 
-## Decision Tree
+** Decision Tree
 
-Lower accuracy (74.52%)
+Extremely high accuracy (99.5%).
 
-Weak AUC (0.64)
+Very high F1 and MCC.
 
-Better recall than Logistic Regression
+May slightly risk overfitting if not pruned properly.
 
-Slightly unstable due to single tree structure
+Excellent performance overall.
 
-Prone to overfitting
+** K-Nearest Neighbors
 
-## K-Nearest Neighbors (KNN)
+Moderate performance.
 
-Good accuracy (80.68%)
+High recall but lower MCC.
 
-Moderate recall (34.65%)
+Sensitive to scaling and feature distribution.
 
-Performs reasonably after scaling
+Computationally expensive for large datasets.
 
-Sensitive to feature scaling and dimensionality
+** Naive Bayes
 
-## Naive Bayes
+Strong AUC (0.9859).
 
-Lowest accuracy (56.95%)
+Fast training time.
 
-Very high recall (84.25%)
+Assumes feature independence.
 
-Very low precision (30.97%)
+Performs surprisingly well on this dataset.
 
-Predicts too many customers as defaulters
+** Random Forest (Ensemble)
 
-High false positive rate
+Very high accuracy (99.08%).
 
-## Random Forest (Best Performing Model)
+Excellent AUC (0.9996).
 
-Highest accuracy (83.51%)
+Low variance and strong generalization.
 
-Strong AUC (0.7977)
+Robust and stable performance.
 
-Best F1 score (0.5123)
+** XGBoost (Best Model ⭐)
 
-Highest MCC (0.4406)
+Highest accuracy: 99.75%
 
-Good balance between precision and recall
+Perfect AUC: 1.000
 
-Best overall model for this dataset
+Highest MCC: 0.9909
 
-## XGBoost
+Extremely low misclassification.
 
-Very close to Random Forest
+Captures complex non-linear relationships.
 
-Highest AUC (0.8026)
+Best overall performing model.
 
-Good overall performance
+** Final Model Ranking
 
-Slightly lower F1 than Random Forest
+1️)XGBoost – Best overall model
+2️)Decision Tree
+3️)Random Forest
+4️)Naive Bayes
+5️)Logistic Regression
+6️)KNN
 
-Strong ensemble model
+** Streamlit Web Application Features
 
-------------------------------------------------------------------------
+The deployed application includes:
 
-## Overall Ranking (Based on F1 & MCC)
+* CSV/XLS file upload
+* Automatic target column detection
+* Model selection from sidebar
+* Train model button
+* Accuracy, AUC, Precision, Recall, F1, MCC display
+* Confusion Matrix visualization
+* Classification Report table
+* Download sample dataset option
 
-1) Random Forest
-
-2) XGBoost
-
-3) Logistic Regression
-
-4) KNN
-
-5) Naive Bayes
-
-6) Decision Tree
-
-------------------------------------------------------------------------
-
-## Streamlit Web Application Features
-
-The deployed Streamlit app provides:
-
-Upload CSV or Excel file
-
-Automatic preprocessing
-
-Model selection from sidebar
-
-Evaluation metrics table
-
-Confusion Matrix visualization
-
-Classification Report
-
-Download predictions as CSV
-
-------------------------------------------------------------------------
-
-## Repository Structure
-
+** Repository Structure **
 ml-model-comparison-app/
 │
-├── app.py                          # Streamlit web application
-├── requirements.txt                # Python dependencies
-├── README.md                       # Project documentation
+├── app.py
+├── README.md
+├── requirements.txt
 │
 ├── model/
 │   ├── 1_logistic_regression.ipynb
@@ -231,33 +184,33 @@ ml-model-comparison-app/
 │   └── 6_xgboost.ipynb
 │
 └── data/
-    ├── credit_default.xls
-    └── credit_default_test_data.xls
-    
-------------------------------------------------------------------------
-## Key Insights
+    ├── train.csv
+    └── test.csv
 
-Ensemble models perform best for credit risk problems.
+** Key Insights **
 
-Recall is very important in default prediction.
+Tree-based and ensemble models significantly outperform linear models.
 
-Random Forest gives best overall balance.
+XGBoost captures complex repayment behavior patterns effectively.
 
-Naive Bayes detects defaulters well but produces too many false alarms.
+Credit default prediction benefits strongly from non-linear learning.
 
-XGBoost gives highest AUC.
+MCC confirms strong balanced classification performance.
 
-------------------------------------------------------------------------
-## Conclusion
+Ensemble methods are highly suitable for financial risk modeling.
 
-Random Forest is the most suitable model for credit default prediction in this project, achieving the best balance across:
+** Conclusion **
 
-Accuracy
+This project demonstrates that ensemble models, especially XGBoost, provide exceptional predictive performance for credit default prediction.
 
-F1 Score
+The implementation showcases:
 
-MCC
+Model comparison
 
-Generalization performance
+Risk evaluation
 
-XGBoost is a strong alternative with excellent AUC performance.
+Financial classification modeling
+
+End-to-end deployment using Streamlit
+
+This system can assist financial institutions in building automated, data-driven credit risk assessment pipelines.
