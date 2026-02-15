@@ -127,7 +127,7 @@ The deployed application includes:
 
 **Repository Structure**
 
-
+```text
 ml-model-comparison-app/
 │
 ├── app.py
