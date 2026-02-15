@@ -36,6 +36,56 @@ st.set_page_config(
 st.title("Credit Card Default Prediction – ML Model Comparison")
 st.markdown("BITS Pilani – Machine Learning Assignment 2")
 
+def generate_sample_data():
+    np.random.seed(42)
+
+    start_id = 23999
+    end_id = 30000
+    n_rows = end_id - start_id + 1   # 6002 rows
+
+    df = pd.DataFrame({
+        "ID": np.arange(start_id, end_id + 1),
+        "LIMIT_BAL": np.random.randint(10000, 1000000, n_rows),
+        "SEX": np.random.choice([1, 2], n_rows),
+        "EDUCATION": np.random.choice([1, 2, 3, 4], n_rows),
+        "MARRIAGE": np.random.choice([1, 2, 3], n_rows),
+        "AGE": np.random.randint(21, 75, n_rows),
+
+        "PAY_0": np.random.randint(-2, 9, n_rows),
+        "PAY_2": np.random.randint(-2, 9, n_rows),
+        "PAY_3": np.random.randint(-2, 9, n_rows),
+        "PAY_4": np.random.randint(-2, 9, n_rows),
+        "PAY_5": np.random.randint(-2, 9, n_rows),
+        "PAY_6": np.random.randint(-2, 9, n_rows),
+
+        "BILL_AMT1": np.random.randint(0, 200000, n_rows),
+        "BILL_AMT2": np.random.randint(0, 200000, n_rows),
+        "BILL_AMT3": np.random.randint(0, 200000, n_rows),
+        "BILL_AMT4": np.random.randint(0, 200000, n_rows),
+        "BILL_AMT5": np.random.randint(0, 200000, n_rows),
+        "BILL_AMT6": np.random.randint(0, 200000, n_rows),
+
+        "PAY_AMT1": np.random.randint(0, 50000, n_rows),
+        "PAY_AMT2": np.random.randint(0, 50000, n_rows),
+        "PAY_AMT3": np.random.randint(0, 50000, n_rows),
+        "PAY_AMT4": np.random.randint(0, 50000, n_rows),
+        "PAY_AMT5": np.random.randint(0, 50000, n_rows),
+        "PAY_AMT6": np.random.randint(0, 50000, n_rows),
+
+        "target": np.random.choice([0, 1], n_rows)
+    })
+
+    return df
+
+
+sample_df = generate_sample_data()
+
+st.download_button(
+    "📥 Download Sample Dataset",
+    data=sample_df.to_csv(index=False),
+    file_name="sample_credit_default.csv",
+    mime="text/csv"
+)
 
 # --------------------------------------------------
 # Upload Dataset
