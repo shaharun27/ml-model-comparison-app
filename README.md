@@ -33,7 +33,7 @@ Features: 23 input features + 1 target column
 The dataset contains financial, demographic, and repayment history information.
 
 
-**Feature	Description
+**Feature	Description**
 LIMIT_BAL	Credit limit amount
 SEX	Gender (1 = Male, 2 = Female)
 EDUCATION	Education level
@@ -45,14 +45,14 @@ PAY_AMT1 to PAY_AMT6	Amount paid in last 6 months
 
 
 
-** Target Variable **
+**Target Variable**
 Value	Meaning
 0	No Default
 1	Default
 
 
 
-** Models Implemented **
+**Models Implemented**
 
 Six machine learning models were implemented and evaluated:
 
@@ -68,7 +68,7 @@ Random Forest
 
 XGBoost
 
-** Model Evaluation Results
+**Model Evaluation Results**
 
 Based on your final trained models:
 
@@ -80,9 +80,22 @@ Naive Bayes      	0.9309	   0.9859	0.9440	    0.9751	0.9593	    0.7353
 Random Forest	    0.9908	   0.9996	0.9911	    0.9980	0.9945	    0.9665
 XGBoost	            0.9975	   1.0000	0.9980	     0.9990	0.9985	    0.9909
 
-** Performance Analysis
 
-** Logistic Regression
+Model Evaluation Results
+
+Based on the final trained models:
+
+Model	Accuracy	AUC	Precision	Recall	F1 Score	MCC
+Logistic Regression	0.9234	0.9643	0.9453	0.9641	0.9546	0.7115
+Decision Tree	0.9950	0.9889	0.9960	0.9980	0.9970	0.9818
+KNN	0.8793	0.8726	0.8965	0.9671	0.9305	0.4986
+Naive Bayes	0.9309	0.9859	0.9440	0.9751	0.9593	0.7353
+Random Forest	0.9908	0.9996	0.9911	0.9980	0.9945	0.9665
+XGBoost	0.9975	1.0000	0.9980	0.9990	0.9985	0.9909
+
+**Performance Analysis**
+
+**Logistic Regression**
 
 Strong linear baseline model.
 
@@ -92,7 +105,7 @@ Slightly lower MCC compared to ensemble models.
 
 Suitable when interpretability is required.
 
-** Decision Tree
+**Decision Tree**
 
 Extremely high accuracy (99.5%).
 
@@ -102,7 +115,7 @@ May slightly risk overfitting if not pruned properly.
 
 Excellent performance overall.
 
-** K-Nearest Neighbors
+**K-Nearest Neighbors**
 
 Moderate performance.
 
@@ -112,7 +125,7 @@ Sensitive to scaling and feature distribution.
 
 Computationally expensive for large datasets.
 
-** Naive Bayes
+**Naive Bayes**
 
 Strong AUC (0.9859).
 
@@ -122,7 +135,7 @@ Assumes feature independence.
 
 Performs surprisingly well on this dataset.
 
-** Random Forest (Ensemble)
+**Random Forest (Ensemble)**
 
 Very high accuracy (99.08%).
 
@@ -132,7 +145,7 @@ Low variance and strong generalization.
 
 Robust and stable performance.
 
-** XGBoost (Best Model ⭐)
+**XGBoost (Best Model ⭐)**
 
 Highest accuracy: 99.75%
 
@@ -146,7 +159,7 @@ Captures complex non-linear relationships.
 
 Best overall performing model.
 
-** Final Model Ranking
+**Final Model Ranking**
 
 1️)XGBoost – Best overall model
 2️)Decision Tree
@@ -155,7 +168,7 @@ Best overall performing model.
 5️)Logistic Regression
 6️)KNN
 
-** Streamlit Web Application Features
+**Streamlit Web Application Features**
 
 The deployed application includes:
 
@@ -168,7 +181,8 @@ The deployed application includes:
 * Classification Report table
 * Download sample dataset option
 
-** Repository Structure **
+**Repository Structure**
+
 ml-model-comparison-app/
 │
 ├── app.py
@@ -186,6 +200,27 @@ ml-model-comparison-app/
 └── data/
     ├── train.csv
     └── test.csv
+	
+	
+ml-model-comparison-app/
+│
+├── app.py
+├── README.md
+├── requirements.txt
+│
+├── model/
+│   ├── 1_logistic_regression.ipynb
+│   ├── 2_decision_tree.ipynb
+│   ├── 3_knn.ipynb
+│   ├── 4_naive_bayes.ipynb
+│   ├── 5_random_forest.ipynb
+│   └── 6_xgboost.ipynb
+│
+└── data/
+    ├── train.csv
+    └── test.csv
+	
+	
 
 ** Key Insights **
 
