@@ -135,12 +135,12 @@ ml-model-comparison-app/
 ├── requirements.txt
 │
 ├── model/
-│   ├── 1_logistic_regression.ipynb
-│   ├── 2_decision_tree.ipynb
-│   ├── 3_knn.ipynb
-│   ├── 4_naive_bayes.ipynb
-│   ├── 5_random_forest.ipynb
-│   └── 6_xgboost.ipynb
+│   ├── 1)Logistic_Regression.ipynb
+│   ├── 2)decision_tree_model.ipynb
+│   ├── 3)knn_model.ipynb
+│   ├── 4)naive_bayes_model.ipynb
+│   ├── 5)random_forest_model.ipynb
+│   └── 6)xgboost_model.ipynb
 │
 └── data/
     ├── credit_default.csv
