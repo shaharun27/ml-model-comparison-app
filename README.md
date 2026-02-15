@@ -145,7 +145,7 @@ ml-model-comparison-app/
 └── data/
     ├── train.csv
     └── test.csv
-	
+```text	
 
 **Key Insights**
 
