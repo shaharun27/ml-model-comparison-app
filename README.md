@@ -215,25 +215,7 @@ Download predictions as CSV
 ------------------------------------------------------------------------
 
 ## Repository Structure
-ml-model-comparison-app/
-│
-├── app.py
-├── requirements.txt
-├── README.md
-│
-├── model/
-│   ├── artifacts/
-│   ├── submission_csv/
-│   ├── 1_logistic_regression.ipynb
-│   ├── 2_decision_tree.ipynb
-│   ├── 3_knn.ipynb
-│   ├── 4_naive_bayes.ipynb
-│   ├── 5_random_forest.ipynb
-│   └── 6_xgboost.ipynb
-│
-└── data/
-    ├── credit_default.xls
-    └── credit_default_test_data.xls
+
 ml-model-comparison-app/
 │
 ├── app.py                          # Streamlit web application
