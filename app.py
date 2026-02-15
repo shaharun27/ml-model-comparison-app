@@ -1,84 +1,265 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    matthews_corrcoef,
+    classification_report,
+    confusion_matrix
+)
+from xgboost import XGBClassifier
 
-# --- 1. MODEL IMPORTS ---
-try:
-    from model.logistic_regression import train_and_evaluate as lr_eval
-    from model.decision_tree_model import train_and_evaluate as dt_eval
-    from model.knn_model import train_and_evaluate as knn_eval
-    from model.naive_bayes_model import train_and_evaluate as nb_eval
-    from model.random_forest_model import train_and_evaluate as rf_eval
-    from model.xgboost_model import train_and_evaluate as xgb_eval
-except ImportError as e:
-    st.error(f"❌ Module Import Error: {e}")
 
-st.set_page_config(page_title="BITS Assignment 2", layout="wide")
-st.title("💳 Credit Card Default Prediction Dashboard")
+# --------------------------------------------------
+# PAGE CONFIG
+# --------------------------------------------------
 
-# --- 2. DATA LOADING ---
-uploaded_file = st.file_uploader("Upload Dataset (credit_default.csv/xls)", type=["csv", "xls"])
+st.set_page_config(
+    page_title="Credit Card Default Prediction",
+    layout="wide"
+)
 
-if uploaded_file:
+st.title("Credit Card Default Prediction – ML Model Comparison")
+st.markdown("BITS Pilani – Machine Learning Assignment 2")
+
+
+# --------------------------------------------------
+# DATA UTILITIES
+# --------------------------------------------------
+
+st.header("1️⃣ Dataset Utilities")
+
+def generate_sample_data():
+    np.random.seed(42)
+    df = pd.DataFrame({
+        "LIMIT_BAL": np.random.randint(10000, 100000, 200),
+        "AGE": np.random.randint(21, 70, 200),
+        "EDUCATION": np.random.choice(["Grad", "UG", "PhD"], 200),
+        "BILL_AMT1": np.random.randint(0, 50000, 200),
+        "PAY_AMT1": np.random.randint(0, 20000, 200),
+        "target": np.random.choice([0, 1], 200)
+    })
+    return df
+
+sample_df = generate_sample_data()
+
+st.download_button(
+    "📥 Download Sample Dataset",
+    data=sample_df.to_csv(index=False),
+    file_name="sample_credit_default.csv",
+    mime="text/csv"
+)
+
+uploaded_file = st.file_uploader(
+    "Upload Credit Card Dataset (CSV or XLS)",
+    type=["csv", "xls"]
+)
+
+df = None
+
+if uploaded_file is not None:
     try:
-        # header=1 skips the title row and starts at the actual column names
-        df = pd.read_excel(uploaded_file, header=1, engine='xlrd')
-        
-        # Clean column names (remove spaces and special characters)
-        df.columns = [str(c).strip() for c in df.columns]
-        
-        # SMART TARGET DETECTION
-        # This looks for common variations of the target column name
-        target_options = ['default.payment.next.month', 'default payment next month', 'TARGET', 'target']
-        found_target = None
-        for col in df.columns:
-            if col.lower() in [t.lower() for t in target_options]:
-                found_target = col
-                break
-        
-        if found_target:
-            df.rename(columns={found_target: "target"}, inplace=True)
-            st.success(f"✅ Target found: '{found_target}'")
-            st.write("### Dataset Preview", df.head())
-
-            # --- 3. TRAINING & EVALUATION ---
-            X = df.drop(columns=['target'])
-            y = df['target']
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-            model_choice = st.selectbox("Select Model", 
-                ["Logistic Regression", "Decision Tree", "KNN", "Naive Bayes", "Random Forest", "XGBoost"])
-
-            mapping = {
-                "Logistic Regression": lr_eval, "Decision Tree": dt_eval, "KNN": knn_eval,
-                "Naive Bayes": nb_eval, "Random Forest": rf_eval, "XGBoost": xgb_eval
-            }
-
-            if st.button("🚀 Run Evaluation"):
-                res = mapping[model_choice](X_train, X_test, y_train, y_test)
-                
-                # Mandatory 6 Metrics [Requirement: 6 Marks]
-                st.subheader(f"📊 {model_choice} Metrics")
-                
-                c1, c2, c3 = st.columns(3)
-                c1.metric("Accuracy", f"{res['Accuracy']:.4f}")
-                c2.metric("AUC Score", f"{res['AUC']:.4f}")
-                c3.metric("Precision", f"{res['Precision']:.4f}")
-                c1.metric("Recall", f"{res['Recall']:.4f}")
-                c2.metric("F1 Score", f"{res['F1']:.4f}")
-                c3.metric("MCC Score", f"{res['MCC']:.4f}")
-
-                # Confusion Matrix [Requirement: 1 Mark]
-                st.subheader("Confusion Matrix")
-                fig, ax = plt.subplots(figsize=(6, 4))
-                sns.heatmap(confusion_matrix(y_test, res['y_pred']), annot=True, fmt='d', cmap='RdPu')
-                st.pyplot(fig)
+        if uploaded_file.name.endswith(".csv"):
+            df = pd.read_csv(uploaded_file)
         else:
-            st.error("❌ Target column not found. Available columns: " + ", ".join(df.columns[:5]) + "...")
-            st.info("Check if Row 2 (index 1) of your file actually contains the column names.")
+            df = pd.read_excel(uploaded_file, header=1)
+
+        st.success("Dataset uploaded successfully!")
 
     except Exception as e:
-        st.error(f"🛑 Error loading file: {e}")
+        st.error(f"Error reading file: {e}")
+        st.stop()
+
+
+# --------------------------------------------------
+# CONTINUE ONLY IF DATA EXISTS
+# --------------------------------------------------
+
+if df is not None:
+
+    df.columns = df.columns.str.strip()
+
+    if "default.payment.next.month" in df.columns:
+        df.rename(columns={"default.payment.next.month": "target"}, inplace=True)
+
+    if "default payment next month" in df.columns:
+        df.rename(columns={"default payment next month": "target"}, inplace=True)
+
+    if "target" not in df.columns:
+        st.error("Dataset must contain a 'target' column.")
+        st.stop()
+
+    st.subheader("Original Dataset Preview")
+    st.dataframe(df.head())
+
+    # --------------------------------------------------
+    # DATA PREPROCESSING
+    # --------------------------------------------------
+
+    st.header("2️⃣ Data Preprocessing")
+
+    # Handle missing values
+    df.fillna(df.median(numeric_only=True), inplace=True)
+
+    # One-Hot Encoding
+    categorical_cols = df.select_dtypes(include="object").columns.tolist()
+
+    if categorical_cols:
+        st.write("Categorical Columns Detected:", categorical_cols)
+        df = pd.get_dummies(df, columns=categorical_cols, drop_first=True)
+        st.success("One-Hot Encoding Applied")
+
+    # Show first 5 processed records
+    st.subheader("Preview of Preprocessed Data (First 5 Rows)")
+    st.dataframe(df.head())
+
+    X = df.drop("target", axis=1)
+    y = df["target"]
+
+    st.write("Final Feature Shape:", X.shape)
+
+    # --------------------------------------------------
+    # TRAIN TEST SPLIT
+    # --------------------------------------------------
+
+    st.header("3️⃣ Train-Test Split")
+
+    test_size = st.slider("Select Test Size", 0.1, 0.4, 0.2)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y,
+        test_size=test_size,
+        random_state=42,
+        stratify=y
+    )
+
+    st.write("Train Shape:", X_train.shape)
+    st.write("Test Shape:", X_test.shape)
+
+    # --------------------------------------------------
+    # MODEL SELECTION
+    # --------------------------------------------------
+
+    st.sidebar.header("Select Model")
+
+    model_name = st.sidebar.selectbox(
+        "Choose Model",
+        [
+            "Logistic Regression",
+            "Decision Tree",
+            "KNN",
+            "Naive Bayes",
+            "Random Forest",
+            "XGBoost"
+        ]
+    )
+
+    if st.button("Train Model"):
+
+        if model_name in ["Logistic Regression", "KNN", "Naive Bayes"]:
+            scaler = StandardScaler()
+            X_train_scaled = scaler.fit_transform(X_train)
+            X_test_scaled = scaler.transform(X_test)
+
+        if model_name == "Logistic Regression":
+            model = LogisticRegression(max_iter=1000)
+            model.fit(X_train_scaled, y_train)
+            y_pred = model.predict(X_test_scaled)
+            y_prob = model.predict_proba(X_test_scaled)[:, 1]
+
+        elif model_name == "Decision Tree":
+            model = DecisionTreeClassifier(random_state=42)
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+            y_prob = model.predict_proba(X_test)[:, 1]
+
+        elif model_name == "KNN":
+            model = KNeighborsClassifier(n_neighbors=5)
+            model.fit(X_train_scaled, y_train)
+            y_pred = model.predict(X_test_scaled)
+            y_prob = model.predict_proba(X_test_scaled)[:, 1]
+
+        elif model_name == "Naive Bayes":
+            model = GaussianNB()
+            model.fit(X_train_scaled, y_train)
+            y_pred = model.predict(X_test_scaled)
+            y_prob = model.predict_proba(X_test_scaled)[:, 1]
+
+        elif model_name == "Random Forest":
+            model = RandomForestClassifier(n_estimators=100, random_state=42)
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+            y_prob = model.predict_proba(X_test)[:, 1]
+
+        elif model_name == "XGBoost":
+            model = XGBClassifier(
+                n_estimators=100,
+                max_depth=6,
+                learning_rate=0.1,
+                eval_metric="logloss",
+                random_state=42
+            )
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+            y_prob = model.predict_proba(X_test)[:, 1]
+
+        # --------------------------------------------------
+        # EVALUATION
+        # --------------------------------------------------
+
+        st.header("4️⃣ Model Evaluation")
+
+        metrics_df = pd.DataFrame({
+            "Metric": ["Accuracy", "AUC", "Precision", "Recall", "F1 Score", "MCC"],
+            "Value": [
+                accuracy_score(y_test, y_pred),
+                roc_auc_score(y_test, y_prob),
+                precision_score(y_test, y_pred, zero_division=0),
+                recall_score(y_test, y_pred, zero_division=0),
+                f1_score(y_test, y_pred, zero_division=0),
+                matthews_corrcoef(y_test, y_pred)
+            ]
+        })
+
+        st.subheader("Overall Metrics")
+        st.dataframe(metrics_df.set_index("Metric"))
+
+        # Classification Report (Tabular)
+        st.subheader("Classification Report")
+        report_dict = classification_report(y_test, y_pred, output_dict=True)
+        report_df = pd.DataFrame(report_dict).transpose()
+        st.dataframe(report_df)
+
+        # Confusion Matrix
+        st.subheader("Confusion Matrix")
+        cm = confusion_matrix(y_test, y_pred)
+
+        fig, ax = plt.subplots()
+        sns.heatmap(
+            cm,
+            annot=True,
+            fmt="d",
+            cmap="viridis",
+            xticklabels=["No Default", "Default"],
+            yticklabels=["No Default", "Default"]
+        )
+        plt.xlabel("Predicted")
+        plt.ylabel("Actual")
+        st.pyplot(fig)
+
+else:
+    st.info("Upload dataset to begin.")
