@@ -96,7 +96,7 @@ Based on the final trained models:
     * Excellent AUC (0.9996).
     * Low variance and strong generalization.
     * Robust and stable performance.
-* **XGBoost (Best Model ⭐)**
+* **XGBoost (Best Model)**
     * Highest accuracy: 99.75%.
     * Perfect AUC: 1.000.
     * Highest MCC: 0.9909.
@@ -145,3 +145,32 @@ ml-model-comparison-app/
 └── data/
     ├── train.csv
     └── test.csv
+	
+
+**Key Insights**
+
+Tree-based and ensemble models significantly outperform linear models.
+
+XGBoost captures complex repayment behavior patterns effectively.
+
+Credit default prediction benefits strongly from non-linear learning.
+
+MCC confirms strong balanced classification performance.
+
+Ensemble methods are highly suitable for financial risk modeling.
+
+**Conclusion**
+
+This project demonstrates that ensemble models, especially XGBoost, provide exceptional predictive performance for credit default prediction.
+
+The implementation showcases:
+
+Model comparison
+
+Risk evaluation
+
+Financial classification modeling
+
+End-to-end deployment using Streamlit
+
+This system can assist financial institutions in building automated, data-driven credit risk assessment pipelines.	
