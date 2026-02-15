@@ -127,7 +127,7 @@ The deployed application includes:
 
 **Repository Structure**
 
-```text
+
 ml-model-comparison-app/
 │
 ├── app.py
@@ -145,7 +145,7 @@ ml-model-comparison-app/
 └── data/
     ├── train.csv
     └── test.csv
-```text	
+
 
 **Key Insights**
 
