@@ -97,9 +97,9 @@ def generate_sample_data():
 sample_df = generate_sample_data()
 
 st.download_button(
-    "📥 Download Sample Dataset",
+    "📥 Download Sample Test Dataset",
     data=sample_df.to_csv(index=False),
-    file_name="sample_credit_default.csv",
+    file_name="sample_credit_default_testdata.csv",
     mime="text/csv"
 )
 
